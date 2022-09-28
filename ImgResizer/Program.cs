@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Xml.Serialization;
 
 namespace ImgResizer
 {
@@ -64,6 +66,17 @@ namespace ImgResizer
             
             Console.WriteLine("Enter command");
             string inputCommand = Console.ReadLine();
+            if (inputCommand.Contains("="))
+            {
+               string[] sub= inputCommand.Split('=');
+               int num;
+               int.TryParse(sub[1],out num);
+                if(((sub[0]=="-w"||(sub[0]=="--width"))&&((num<1200)&&(num>100))))
+                {
+                    return inputCommand;
+                }
+                return null;
+            }
             if (Commands.Contains(inputCommand))
             {
                 return inputCommand;
