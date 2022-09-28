@@ -60,34 +60,31 @@ namespace ImgResizer
 
         }
 
-        public static string GetCommand()
+        private static string GetCommand()
         {
-            int x;
-            
             Console.WriteLine("Enter command");
             string inputCommand = Console.ReadLine();
             if (inputCommand.Contains("="))
             {
-               string[] sub= inputCommand.Split('=');
-               int num;
-               int.TryParse(sub[1],out num);
-                if(((sub[0]=="-w"||(sub[0]=="--width"))&&((num<1200)&&(num>100))))
+                string[] sub = inputCommand.Split('=');
+                int num;
+                int.TryParse(sub[1], out num);
+                if (((sub[0] == "-w" || (sub[0] == "--width")) && ((num < 1200) && (num > 100))))
                 {
                     return inputCommand;
                 }
+                Helpers.InvalidInput("command");
                 return null;
             }
             if (Commands.Contains(inputCommand))
             {
                 return inputCommand;
             }
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Invalid command");
-            Console.ResetColor();
+            Helpers.InvalidInput("command");
             return null;
 
         }
-        public static string GetPath()
+        private static string GetPath()
         {
             Console.WriteLine("Enter path:");
             string inputString = Console.ReadLine();
@@ -95,12 +92,10 @@ namespace ImgResizer
             {
                 return inputString;
             }
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Invalid path");
-            Console.ResetColor();
+
+            Helpers.InvalidInput("path");
             Environment.Exit(0);//Po odebrání se bude program ptát na cestu dokud uživatel nezadá existující cestu
             return null;
         }
     }
-
 }
