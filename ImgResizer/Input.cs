@@ -48,33 +48,8 @@ namespace ImgResizer
                         Command = CheckCommand(args[i]);
                     }
                 }
-                /*  if (args.Length == 1)
-                  {
-                      if (!Directory.Exists(args[0]))
-                      {
-                          Path = GetPath();
-                          Command = GetCommand();
-                          continue;
-                      }
-                      Path = args[0];
-                      Command = GetCommand();
-                  }
-                  if (args.Length == 2)
-                  {
-                      if (!Directory.Exists(args[0]))
-                      {
-                          Path = GetPath();
-                          continue;
-                      }
-                      Path = args[0];
-                      if (Commands.Contains(args[1]))
-                      {
-                          Command = args[1];
-                          continue;
-                      }
-                      Command = GetCommand();
-                  }*/
             }
+            idk = GetCommandType(Command);
         }
         private static string GetCommand()
         {
@@ -96,9 +71,8 @@ namespace ImgResizer
                      || (Regex.Replace(sub[0], @"\s+", "") == "-resize--width"))//špinave
                     && ((num < 1200) && (num > 100)))
                 {
-                   
                     return inputCommand;
-                }
+                } 
                 Helpers.InvalidInput("Command");
                 Environment.Exit(0);
                 return null;
@@ -114,6 +88,23 @@ namespace ImgResizer
             return null;
         }
 
+        private static commands GetCommandType(string inputCommand)
+        {
+            if (inputCommand.Contains("="))
+            {
+                return commands.resize;
+            }
+            if (inputCommand.Contains("-t"))
+            {
+                return commands.thumbs;
+            }
+            if (inputCommand.Contains("-c"))
+            {
+                return commands.clean;
+            }
+            return commands.clean ;
+
+        }
         private static string GetPath()
         {
             Console.WriteLine("Enter Path:");

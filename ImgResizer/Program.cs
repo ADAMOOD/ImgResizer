@@ -23,8 +23,8 @@ namespace ImgResizer
                             Directory.CreateDirectory($"{operation.Path}\\thumbs");
                             var allfiles = Directory.GetFiles(operation.Path).Select(x => new FileInfo(x)).ToList();
                             foreach (var file in allfiles)
-                            {/*
-                                if ()
+                            {
+                              /*  if ()
                                 {
                                     
                                 }
