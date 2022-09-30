@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace ImgResizer
 {
-    public enum commands
+    public enum Commands
     {
         resize, thumbs, clean
     }
@@ -16,9 +16,9 @@ namespace ImgResizer
     {
 
         public static string[] Commands = { "-t", "--thumbs", "-c", "--clean" };
-        public string Path = null;
+        public static string Path = null;
         public string Command = null;
-        public commands idk { get; set; }
+        public Commands Type { get; set; }
         public Input(string[] args)
         {
             while ((Path == null) || (Command == null))
@@ -34,22 +34,23 @@ namespace ImgResizer
                         Command = GetCommand();
                     }
                 }
-
                 if (args.Length > 0)
                 {
+
+
                     if (!Directory.Exists(args[0]))
                     {
                         Path = GetPath();
-                        Command = GetCommand();
                         continue;
                     }
-                    for (int i = 1; i < args.Length; i++)
+                    if (String.IsNullOrEmpty(args[1]))
                     {
-                        Command = CheckCommand(args[i]);
+                        Command = GetCommand();
                     }
+                    Command = CheckCommand(args[1]);
                 }
             }
-            idk = GetCommandType(Command);
+            Type = GetCommandType(Command);
         }
         private static string GetCommand()
         {
@@ -60,50 +61,68 @@ namespace ImgResizer
 
         private static string CheckCommand(string inputCommand)
         {
+            if ((Regex.Replace(inputCommand, @"\s+", "") == "-r") || (Regex.Replace(inputCommand, @"\s+", "") == "--resize"))
+            {
+                Helpers.InvalidInput("Width command");
+                Console.WriteLine("please Enter width command");
+                return CheckResizeWidthCommand($"{inputCommand}{Console.ReadLine()}");
+            }
             if (inputCommand.Contains("="))
             {
-                string[] sub = inputCommand.Split('=');
-                int num;
-                int.TryParse(sub[1], out num);
-                if (((Regex.Replace(sub[0], @"\s+", "") == "-r-w")//špinave
-                     || (Regex.Replace(sub[0], @"\s+", "") == "-resize-w")//špinave
-                     || (Regex.Replace(sub[0], @"\s+", "") == "-r--width")//špinave
-                     || (Regex.Replace(sub[0], @"\s+", "") == "-resize--width"))//špinave
-                    && ((num < 1200) && (num > 100)))
-                {
-                    return inputCommand;
-                } 
-                Helpers.InvalidInput("Command");
-                Environment.Exit(0);
-                return null;
+                return CheckResizeWidthCommand(inputCommand);
             }
 
             if (Commands.Contains(inputCommand))
             {
                 return inputCommand;
             }
-
             Helpers.InvalidInput("Command");
             Environment.Exit(0);
             return null;
         }
 
-        private static commands GetCommandType(string inputCommand)
+        private static string CheckResizeWidthCommand(string inputCommand)
+        {
+            string[] sub = inputCommand.Split('=');
+            int num;
+            int.TryParse(sub[1], out num);
+            if (((Regex.Replace(sub[0], @"\s+", "") == "-r-w") //špinave
+                 || (Regex.Replace(sub[0], @"\s+", "") == "-resize-w") //špinave
+                 || (Regex.Replace(sub[0], @"\s+", "") == "-r--width") //špinave
+                 || (Regex.Replace(sub[0], @"\s+", "") == "-resize--width")) //špinave
+                && ((num < 1200) && (num > 100)))
+            {
+                return inputCommand;
+            }
+            Helpers.InvalidInput("Command");
+            return null;
+        }
+
+        private static Commands GetCommandType(string inputCommand)
         {
             if (inputCommand.Contains("="))
             {
-                return commands.resize;
+                return ImgResizer.Commands.resize;
             }
             if (inputCommand.Contains("-t"))
             {
-                return commands.thumbs;
+                CheckingIfDirExistAndMakingIt();
+                return ImgResizer.Commands.thumbs;
             }
             if (inputCommand.Contains("-c"))
             {
-                return commands.clean;
+                return ImgResizer.Commands.clean;
             }
-            return commands.clean ;
+            return ImgResizer.Commands.clean;
 
+        }
+        private static void CheckingIfDirExistAndMakingIt()
+        {
+            string thumbsPath = $"{Path}\\thumbs";
+            if (!Directory.Exists(thumbsPath))
+            {
+                Directory.CreateDirectory(thumbsPath);
+            }
         }
         private static string GetPath()
         {

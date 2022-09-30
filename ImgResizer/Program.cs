@@ -14,23 +14,27 @@ namespace ImgResizer
         static void Main(string[] args)
         {
             var operation = new Input(args);
-            switch (operation.idk)
+           
+            switch (operation.Type)
             {
-                case 0:
-                    {
-                        if (!Directory.Exists($"{operation.Path}\\thumbs"))
-                        {
-                            Directory.CreateDirectory($"{operation.Path}\\thumbs");
-                            var allfiles = Directory.GetFiles(operation.Path).Select(x => new FileInfo(x)).ToList();
+                case Commands.resize:
+                {
+                    Console.WriteLine("");
+                    break;
+                }
+                case Commands.thumbs:
+                {
+                    var allfiles = Directory.GetFiles(operation.).Select(x => new FileInfo(x)).ToList();
                             foreach (var file in allfiles)
                             {
-                              /*  if ()
+                                var fileSplited = file.Name.Split(".");
+                                if ((fileSplited[fileSplited.Length-1]=="jpeg")|| (fileSplited[fileSplited.Length-1] == "jpg"))
                                 {
-                                    
+                                    Console.WriteLine(file.Name);
                                 }
-                                var images=*/
+                                
                             }
-                        }
+                        
                             break;
                     }
 
