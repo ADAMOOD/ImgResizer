@@ -24,19 +24,9 @@ namespace ImgResizer
                 }
                 case Commands.thumbs:
                 {
-                    var allfiles = Directory.GetFiles(operation.).Select(x => new FileInfo(x)).ToList();
-                            foreach (var file in allfiles)
-                            {
-                                var fileSplited = file.Name.Split(".");
-                                if ((fileSplited[fileSplited.Length-1]=="jpeg")|| (fileSplited[fileSplited.Length-1] == "jpg"))
-                                {
-                                    Console.WriteLine(file.Name);
-                                }
-                                
-                            }
-                        
-                            break;
-                    }
+                    Input.Thumbs(operation);
+                    break;
+                }
 
             }
         }

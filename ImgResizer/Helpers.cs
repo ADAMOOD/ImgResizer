@@ -7,10 +7,10 @@ namespace ImgResizer
     internal class Helpers
     {
 
-        public static void InvalidInput(string input)
+        public static void Error(string errorMsg)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Invalid {input}");
+            Console.WriteLine(errorMsg);
             Console.ResetColor();
         }
     }

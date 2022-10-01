@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace ImgResizer
 {
@@ -58,12 +61,59 @@ namespace ImgResizer
             string inputCommand = Console.ReadLine();
             return CheckCommand(inputCommand);
         }
+        public static void Thumbs(Input operation)
+        {
+            var allfiles = Directory.GetFiles(Path).Select(x => new FileInfo(x)).ToList();
+            var Images = FindImages(allfiles);
+            if (CheckIfArrayIsEmpty(allfiles))
+            {
+                Helpers.Error($"Can't find any image in Directory ->{Path}");
+            }
 
+            foreach (var image in Images)
+            {
+
+                using (var img = Image.Load(image.FullName))
+                {
+                    img.Mutate(i => i.Resize(new ResizeOptions
+                    {
+                        Size = new Size(75),
+                        Mode = ResizeMode.Crop
+                    }));
+                  
+                    img.SaveAsJpeg($"{Path}\\thumbs");
+                }
+            }
+        }
+
+     /*   private static string GetFileNameWithoutDot(FileInfo file)
+        {
+            string suffix = file.Extension.Replace(".", string.Empty);
+            return file.Name.Replace(file.Extension, suffix);
+        }*/
+        private static List<FileInfo> FindImages(List<FileInfo> allfiles)
+        {
+            List<FileInfo> Images = new List<FileInfo>();
+            foreach (var file in allfiles)
+            {
+                
+                if ((file.Extension == ".jpeg") || (file.Extension == ".jpg"))
+                {
+                    Images.Add(file);
+                }
+            }
+            return Images;
+        }
+
+        public static bool CheckIfArrayIsEmpty(List<FileInfo> files)
+        {
+            return (files == null || files.Count == 0);
+        }
         private static string CheckCommand(string inputCommand)
         {
             if ((Regex.Replace(inputCommand, @"\s+", "") == "-r") || (Regex.Replace(inputCommand, @"\s+", "") == "--resize"))
             {
-                Helpers.InvalidInput("Width command");
+                Helpers.Error("Width command");
                 Console.WriteLine("please Enter width command");
                 return CheckResizeWidthCommand($"{inputCommand}{Console.ReadLine()}");
             }
@@ -76,7 +126,7 @@ namespace ImgResizer
             {
                 return inputCommand;
             }
-            Helpers.InvalidInput("Command");
+            Helpers.Error($"Invalid input ->{inputCommand}");
             Environment.Exit(0);
             return null;
         }
@@ -94,7 +144,7 @@ namespace ImgResizer
             {
                 return inputCommand;
             }
-            Helpers.InvalidInput("Command");
+            Helpers.Error($"Invalid input ->{inputCommand}");
             return null;
         }
 
@@ -133,11 +183,9 @@ namespace ImgResizer
                 return inputString;
             }
 
-            Helpers.InvalidInput("Path");
+            Helpers.Error($"Invalid path ->{Path}");
             Environment.Exit(0);//Po odebrání se bude program ptát na cestu dokud uživatel nezadá existující cestu
             return null;
         }
     }
-
-
 }
