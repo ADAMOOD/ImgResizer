@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace ImgResizer
             string inputCommand = Console.ReadLine();
             return CheckCommand(inputCommand);
         }
-        public static void Thumbs(Input operation)
+        public void Thumbs()
         {
             var allfiles = Directory.GetFiles(Path).Select(x => new FileInfo(x)).ToList();
             var Images = FindImages(allfiles);
@@ -72,7 +73,8 @@ namespace ImgResizer
 
             foreach (var image in Images)
             {
-
+                var time = new Stopwatch();
+                time.Start();
                 using (var img = Image.Load(image.FullName))
                 {
                     img.Mutate(i => i.Resize(new ResizeOptions
@@ -80,17 +82,17 @@ namespace ImgResizer
                         Size = new Size(75),
                         Mode = ResizeMode.Crop
                     }));
-                  
-                    img.SaveAsJpeg($"{Path}\\thumbs");
+                    img.SaveAsJpeg($"{Path}\\thumbs\\{image.Name}.jpeg");
                 }
+                time.Stop();
+                Console.WriteLine($"Image thumb for: {GetFileName(image)}.jpeg created in {time.ElapsedMilliseconds}ms");
             }
         }
 
-     /*   private static string GetFileNameWithoutDot(FileInfo file)
+       private static string GetFileName(FileInfo file)
         {
-            string suffix = file.Extension.Replace(".", string.Empty);
-            return file.Name.Replace(file.Extension, suffix);
-        }*/
+            return file.Name.Replace(file.Extension, string.Empty);
+        }
         private static List<FileInfo> FindImages(List<FileInfo> allfiles)
         {
             List<FileInfo> Images = new List<FileInfo>();

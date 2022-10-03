@@ -24,7 +24,7 @@ namespace ImgResizer
                 }
                 case Commands.thumbs:
                 {
-                    Input.Thumbs(operation);
+                    operation.Thumbs();
                     break;
                 }
 
