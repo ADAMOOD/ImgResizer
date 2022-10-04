@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using SixLabors.ImageSharp;
@@ -15,6 +16,8 @@ namespace ImgResizer
         {
             Path = path;
         }
+
+        #region Thumbs
         public void Thumbs()
         {
             string thumbsDirPath = $"{Path}\\thumbs";
@@ -43,6 +46,43 @@ namespace ImgResizer
             }
         }
 
+
+        #endregion
+
+        public void Clean()
+        {
+            if (Directory.Exists($"{Path}\\thumbs"))
+            {
+                Directory.Delete($"{Path}\\thumbs", true);
+            }
+            var imgs = FindImages();
+
+            foreach (var img in imgs)
+            {
+                if (img.Extension.Equals(".jpeg"))
+                {
+                    var arr = img.Name.Split(".");
+                    
+                    if (arr[arr.Length - 2].Equals("width") )
+                    {
+                        string nameWithoutWidth = null;
+                        for (int i = 0; i < arr.Length - 2; i++)
+                        {
+                            nameWithoutWidth+=arr[i];
+                        }
+                        nameWithoutWidth += img.Extension;
+                        var imgsNames = imgs.Select(i => i.Name).ToList();
+                        if (imgsNames.Contains(nameWithoutWidth))
+                        {
+                            img.Delete();
+                        }
+
+                    }
+                }
+
+            }
+        }
+
         private static string GetFileName(FileInfo file)
         {
             return file.Name.Replace(file.Extension, string.Empty);
@@ -55,7 +95,7 @@ namespace ImgResizer
             foreach (var file in allfiles)
             {
 
-                if ((file.Extension == ".jpeg") || (file.Extension == ".jpg"))
+                if ((file.Extension.Equals(".jpeg")) || (file.Extension.Equals(".jpg")))
                 {
                     Images.Add(file);
                 }

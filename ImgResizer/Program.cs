@@ -13,7 +13,7 @@ namespace ImgResizer
         static void Main(string[] args)
         {
             var input = new Input(args);
-            var operation = new ImgManager(input.Path);
+            var manager = new ImgManager(input.Path);
             switch (input.Type)
             {
                 case Commands.resize:
@@ -23,9 +23,14 @@ namespace ImgResizer
                     }
                 case Commands.thumbs:
                     {
-                        operation.Thumbs();
+                        manager.Thumbs();
                         break;
                     }
+                case Commands.clean:
+                {
+                    manager.Clean();
+                    break;
+                }
             }
         }
     }
