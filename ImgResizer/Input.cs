@@ -18,43 +18,44 @@ namespace ImgResizer
     }
     public class Input
     {
-
         public static string[] Commands = { "-t", "--thumbs", "-c", "--clean" };
-        public static string Path = null;
+        public string Path = null;
         public string Command = null;
         public Commands Type { get; set; }
         public Input(string[] args)
         {
-            while ((Path == null) || (Command == null))
+            string pathHelp = null;
+            string commandHelp = null;
+            while ((pathHelp == null) || (commandHelp == null))
             {
                 if (args.Length == 0)
                 {
-                    if (Path == null)
+                    if (pathHelp == null)
                     {
-                        Path = GetPath();
+                        pathHelp = GetPath();
                     }
-                    if (Command == null)
+                    if (commandHelp == null)
                     {
-                        Command = GetCommand();
+                        commandHelp = GetCommand();
                     }
                 }
                 if (args.Length > 0)
                 {
-
-
                     if (!Directory.Exists(args[0]))
                     {
-                        Path = GetPath();
+                        pathHelp = GetPath();
                         continue;
                     }
                     if (String.IsNullOrEmpty(args[1]))
                     {
-                        Command = GetCommand();
+                        commandHelp = GetCommand();
                     }
-                    Command = CheckCommand(args[1]);
+                    commandHelp = CheckCommand(args[1]);
                 }
             }
-            Type = GetCommandType(Command);
+            Type = GetCommandType(commandHelp);
+            Path = pathHelp;
+            Command = commandHelp;
         }
         private static string GetCommand()
         {
@@ -62,55 +63,8 @@ namespace ImgResizer
             string inputCommand = Console.ReadLine();
             return CheckCommand(inputCommand);
         }
-        public void Thumbs()
-        {
-            var allfiles = Directory.GetFiles(Path).Select(x => new FileInfo(x)).ToList();
-            var Images = FindImages(allfiles);
-            if (CheckIfArrayIsEmpty(allfiles))
-            {
-                Helpers.Error($"Can't find any image in Directory ->{Path}");
-            }
 
-            foreach (var image in Images)
-            {
-                var time = new Stopwatch();
-                time.Start();
-                using (var img = Image.Load(image.FullName))
-                {
-                    img.Mutate(i => i.Resize(new ResizeOptions
-                    {
-                        Size = new Size(75),
-                        Mode = ResizeMode.Crop
-                    }));
-                    img.SaveAsJpeg($"{Path}\\thumbs\\{image.Name}.jpeg");
-                }
-                time.Stop();
-                Console.WriteLine($"Image thumb for: {GetFileName(image)}.jpeg created in {time.ElapsedMilliseconds}ms");
-            }
-        }
 
-       private static string GetFileName(FileInfo file)
-        {
-            return file.Name.Replace(file.Extension, string.Empty);
-        }
-        private static List<FileInfo> FindImages(List<FileInfo> allfiles)
-        {
-            List<FileInfo> Images = new List<FileInfo>();
-            foreach (var file in allfiles)
-            {
-                
-                if ((file.Extension == ".jpeg") || (file.Extension == ".jpg"))
-                {
-                    Images.Add(file);
-                }
-            }
-            return Images;
-        }
-
-        public static bool CheckIfArrayIsEmpty(List<FileInfo> files)
-        {
-            return (files == null || files.Count == 0);
-        }
         private static string CheckCommand(string inputCommand)
         {
             if ((Regex.Replace(inputCommand, @"\s+", "") == "-r") || (Regex.Replace(inputCommand, @"\s+", "") == "--resize"))
@@ -158,7 +112,6 @@ namespace ImgResizer
             }
             if (inputCommand.Contains("-t"))
             {
-                CheckingIfDirExistAndMakingIt();
                 return ImgResizer.Commands.thumbs;
             }
             if (inputCommand.Contains("-c"))
@@ -168,15 +121,8 @@ namespace ImgResizer
             return ImgResizer.Commands.clean;
 
         }
-        private static void CheckingIfDirExistAndMakingIt()
-        {
-            string thumbsPath = $"{Path}\\thumbs";
-            if (!Directory.Exists(thumbsPath))
-            {
-                Directory.CreateDirectory(thumbsPath);
-            }
-        }
-        private static string GetPath()
+
+        private  string GetPath()
         {
             Console.WriteLine("Enter Path:");
             string inputString = Console.ReadLine();
@@ -186,7 +132,7 @@ namespace ImgResizer
             }
 
             Helpers.Error($"Invalid path ->{Path}");
-            Environment.Exit(0);//Po odebrání se bude program ptát na cestu dokud uživatel nezadá existující cestu
+            Environment.Exit(0);
             return null;
         }
     }

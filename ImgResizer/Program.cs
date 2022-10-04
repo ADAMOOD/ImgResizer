@@ -10,27 +10,23 @@ namespace ImgResizer
 {
     internal class Program
     {
-
         static void Main(string[] args)
         {
-            var operation = new Input(args);
-           
-            switch (operation.Type)
+            var input = new Input(args);
+            var operation = new ImgManager(input.Path);
+            switch (input.Type)
             {
                 case Commands.resize:
-                {
-                    Console.WriteLine("");
-                    break;
-                }
+                    {
+                        Console.WriteLine("");
+                        break;
+                    }
                 case Commands.thumbs:
-                {
-                    operation.Thumbs();
-                    break;
-                }
-
+                    {
+                        operation.Thumbs();
+                        break;
+                    }
             }
         }
-
-
     }
 }
